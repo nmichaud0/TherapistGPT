@@ -114,3 +114,7 @@ Stay up-to-date with the latest news, updates, and insights about TherapistGPT b
 - [Instagram](https://instagram.com/nizarmichaud)
 
 We look forward to connecting with you and hearing your thoughts, ideas, and experiences with TherapistGPT.
+
+## TODO:
+
+- Worker timeout-3000ms on Heroku --> queue requests for web deploy
