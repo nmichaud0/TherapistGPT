@@ -1,0 +1,7 @@
+Based on the following informations of a digital therapy please choose an action for the therapist to make.
+
+### CONTEXT ###
+
+### ACTIONS LIST ###
+
+Please only answer with one number. Note that the list begins at 0, if you consider two actions to be equal please put both numbers separated by a space.

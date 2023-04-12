@@ -1,0 +1,22 @@
+Based on the following content I ask you to tell me which therapy is the best suited for the client.
+
+Anamnesis:
+
+### ANAMNESIS ###
+
+User informations:
+
+### USER INFORMATIONS ###
+
+User demand:
+
+### USER DEMAND ###
+
+Therapy Transcript:
+
+### THERAPY TRANSCRIPT ###
+
+Here are the therapy types:
+### THERAPY TYPES ###
+
+Please only answer with one of these number and nothing else. If you if you consider that two therapies are equally good, please answer with both numbers separated by a space.

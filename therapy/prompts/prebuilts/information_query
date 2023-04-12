@@ -1,0 +1,11 @@
+{
+  "name": "Your name or preferred alias.",
+  "age": "Your age.",
+  "gender": "Your gender (if you're comfortable sharing).",
+  "occupation": "Your occupation.",
+  "language": "Your primary language and any additional languages you speak.",
+  "marital_status": "Your marital status.",
+  "therapy_reason": "A brief description of the reason you're seeking therapy.",
+  "therapy_goals": "Your primary therapy goals or what you hope to achieve through our sessions.",
+  "therapy_personal_history": "A short summary of any relevant personal history that may help me understand your situation better."
+}

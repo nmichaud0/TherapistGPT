@@ -1,0 +1,7 @@
+Based on the following content I ask you to tell me what demand the client is asking for in the therapy. We might be in the early stages so the anamnesis might not be complete though.
+
+### CONTEXT ###
+
+Please tell me what you think the client is asking for in the therapy. Please be as specific as possible and return between 1 and 3 sentences.
+If you don't have enough informations to answer the question (like if you just have basic user demography data and not a specific demand), please just respond with a "0".
+IF YOU CANNOT ANSWER THE QUESTION JUST WRITE A ZERO: 0

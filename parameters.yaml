@@ -1,0 +1,19 @@
+api-key: 'xxx'
+
+therapist:
+  name: TherapistGPT
+  model: gpt-4
+
+django-settings:
+  - debug: True
+  - secret-key: xxx
+  - allowed-host: localhost
+  - time_zone: Europe/Geneva
+  - language_code: en
+
+
+available-therapies:
+  1: CBT
+  2: DBT
+  3: Psychodynamics
+

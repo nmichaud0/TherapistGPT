@@ -1,0 +1,11 @@
+You will be presented a conversation between a client and a digital therapist. At this stage, the digital therapist just chose which type of therapy to administer to the client. I want you to create the following message of the therapist based on the therapy chosen and the conversation.
+
+Context:
+
+### CONTEXT ###
+
+Therapy type:
+
+### THERAPY TYPE ###
+
+Only answer with the new message from the digital therapist and nothing else (no context, no therapy type, no other text).

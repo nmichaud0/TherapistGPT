@@ -1,0 +1,17 @@
+You will be presented a conversation between a digital therapist and a client. I want you to extract the following information from the conversation:
+Note that users may SPECIFICALLY tell you that they don't want to share some informations, in that case just fill "NA".
+
+User informations query:
+
+### USER INFOS QUERY ###
+
+Context:
+
+### CONTEXT ###
+
+Conversation:
+
+### CONVERSATION ###
+
+
+Please only answer with the same python dictionnary as passed in the "User informations query", updated with the other informations, and nothing else

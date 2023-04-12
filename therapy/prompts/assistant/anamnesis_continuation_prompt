@@ -1,0 +1,11 @@
+Hello, I will provide you a client anamnesis as well as a conversation. I want your answer to be the continuation of the anamnesis based on the conversation.
+If you don't find any new valuable information to add to the anamnesis in the conversation, please do not write anything.
+I want the anamnesis to be concise, precise and clear. Do not repeat the anamnesis, just continue it.
+
+Anamnesis:
+
+### ANAMNESIS ###
+
+Maximum context available:
+
+### CONTEXT ###

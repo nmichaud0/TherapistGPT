@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'chat.css' %}">
+    <script src="{% static 'chat.js' %}"></script>
+    <title>TherapistGPT</title>
+</head>
+<body>
+    <header>
+
+        <div class="download-data-btn-div" id="download-data-btn-div">
+            <button class="download-data-btn" id="download-data-btn">Fetch Data</button>
+        </div>
+
+
+        <div class="header-content">
+            <img class="banner-logo" src="{% static 'img/TherapistGPT_logo.png' %}" alt="TherapistGPT logo" id="logo"/>
+            <u class="therapist-title" id="therapist-name">TherapistGPT</u>
+        </div>
+
+        <div class="GPTs-container">
+            <p id="GPT-label" class="GPT-label">GPT 4</p>
+
+            <div class="GPT-version-button-div">
+                <label class="GPT-version-button">
+                    <input type="checkbox" id="checkbox-GPT">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+        </div>
+    </header>
+    <main>
+        <section id="chat-window">
+            <div id="messages-container" class="messages-container" style="overflow: auto">
+                <!-- Chat messages will be displayed here -->
+            </div>
+        </section>
+        <section id="user-input-section" class="input-section">
+            <form id="message-form" class="message-form">
+                {% csrf_token %}
+                <label for="user-input"></label><textarea type="text" id="user-input" class="user-input" placeholder="Type your message here..."></textarea>
+                <button type="submit" id="send-button" class="send-button">Send</button>
+            </form>
+        </section>
+    </main>
+
+<!-- add a circle on the bottom right of the page that opens a small window to send api keys -->
+    <div class="api-key-circle" id="api-btn">
+        <img src="{% static 'img/API-KEY_light.png' %}" alt="api-key" class="api-key-img">
+    </div>
+
+    <footer>
+    <div class="social-icons-footer">
+      <a href="https://github.com/nmichaud0" class="icon-link">
+        <img src="{% static 'img/github-icon-white.png' %}" alt="Facebook Icon" class="icon"> Github
+      </a>
+      <a href="https://twitter.com/nizarmichaud_" class="icon-link">
+        <img src="{% static 'img/twitter-icon.png' %}" alt="Twitter Icon" class="icon"> Twitter
+      </a>
+    </div>
+        <br>
+    <div class="footer-text" style="color: white; display: flex; flex-direction: column; align-items: center">
+        <p>&copy; 2023 - Nizar Michaud<br></p>
+        <p>This is an open-source project released under the
+          <a href="https://choosealicense.com/licenses/mit/" target="_blank"
+             rel="noopener noreferer" style="color: deepskyblue;">MIT License</a></p>
+    </div>
+    </footer>
+
+</body>
+</html>
