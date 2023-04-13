@@ -8,6 +8,10 @@ As privacy is our top priority, TherapistGPT does not include database managemen
 
 Discover the potential of TherapistGPT by trying the demo at [therapist.digital](http://therapist.digital).
 
+## Software Architecture Diagram:
+
+![](Software_Arch.png?raw=true)
+
 ## Table of Contents
 
 - [🚀 Features](#-features)
@@ -139,5 +143,9 @@ Stay up-to-date with the latest news, updates, and insights about TherapistGPT b
 We look forward to connecting with you and hearing your thoughts, ideas, and experiences with TherapistGPT.
 
 ## TODO:
+
+- Upload new version -> manages the timeouts when running on server with redis & celery
+
+## DONE:
 
 - Worker timeout-3000ms on Heroku --> queue requests for web deploy
