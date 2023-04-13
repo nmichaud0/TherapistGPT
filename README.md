@@ -37,6 +37,7 @@ Discover the potential of TherapistGPT by trying the demo at [therapist.digital]
 
 - Python 3.9
 - OpenAI API key (preferably with GPT-4 access)
+- [Redis server](https://redis.io/download/) 
 
 ## 💾 Installation
 
@@ -52,19 +53,41 @@ git clone https://github.com/nmichaud0/TherapistGPT.git
 cd TherapistGPT
 ```
 
-3. Install the required dependencies:
+3. Create a new Python virtual environment and activate it:
+
+```
+python -m venv /venv
+source venv/bin/activate
+```
+
+4. Install the required dependencies:
 
 ```
 pip install -r requirements.txt
 ```
 
-4. Add your OpenAI API key to the `parameters.yaml` file.
+5. Open a new terminal window and run your redis server:
 
-5. Run the Django server:
+```
+redis-server
+```
+
+6. Open another terminal window, navigate to the project directory, activate the virtual environment and run a celery worker:
+
+```
+source venv/bin/activate
+TherapistGPT % celery -A TherapistGPT worker --loglevel=info
+```
+
+7. Open another terminal window, navigate to the project directory, activate the environment and run the Django server:
 
 ```
 python manage.py runserver
 ```
+
+8. Connect to the local website at : http://127.0.0.1:8000/
+
+9. Add your own OpenAI API key with the blue "+" button and you're good to go.
 
 ## 🔧 Usage
 
