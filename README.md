@@ -144,8 +144,9 @@ We look forward to connecting with you and hearing your thoughts, ideas, and exp
 
 ## TODO:
 
-- Upload new version -> manages the timeouts when running on server with redis & celery
+- Vector database memory
 
 ## DONE:
 
 - Worker timeout-3000ms on Heroku --> queue requests for web deploy
+- Upload new version -> manages the timeouts when running on server with redis & celery
