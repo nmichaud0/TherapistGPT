@@ -78,38 +78,86 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-        messageForm.addEventListener('keydown', (event) => {
+        messageForm.addEventListener('keydown', async (event) => {
 
-            if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            const userMessage = userInput.value.trim();
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    const userMessage = userInput.value.trim();
 
-            if (userMessage) {
 
-                // Get amount of messages in the message-container
+                    if (userMessage) {
+
+                        if (valid_api_key) {
+
+                            await sendMessageToTherapist(userMessage)
+
+                        } else {
+                            alert("Please provide a valid OpenAI API key with the blue '+' button. We won't store any of your" +
+                                " informations.\n\n" +
+                                'You can find an OpenAI API key tutorial here: ' +
+                                'https://elephas.app/blog/how-to-create-openai-api-keys-cl5c4f21d281431po7k8fgyol0 \n\n' +
+                                'You can still run the website locally if you prefer. Informations about that available on our' +
+                                ' GitHub.'
+                            )
+                        }
+                    }
+                }
+            }
+
+        );
+
+        async function sendMessageToTherapist(userMessage, first_msg=false) {
+
+            // Get amount of messages in the message-container
+
+            if (!first_msg) {
+
                 const messages = document.getElementById('messages-container').children;
                 const message_count = messages.length;
 
-                if (message_count <= 2 && !DEBUG) {
-                alert('This digital therapist is a research experiment, not a medical tool. It\'s not a substitute for ' +
-                    'professional mental health care. If you need support, seek help from a qualified professional.' +
-                    ' Use at your own discretion.');
+                if (message_count <= 1 && !DEBUG) {
+                    alert('This digital therapist is a research experiment, not a medical tool. It\'s not a substitute for ' +
+                        'professional mental health care. If you need support, seek help from a qualified professional.' +
+                        ' Use at your own discretion.');
                 }
 
 
                 // Display user message
-                addMessageToChat('user', userMessage, false);
+                await addMessageToChat('user', userMessage, false);
 
                 // Clear input field
                 userInput.value = '';
-
-                // Send user message to TherapistGPT
-                sendMessageToTherapist(userMessage).then((message) => {
-                    // Display therapist response
-                    addMessageToChat('therapist', message, true);
-                });
             }
-        }});
+
+            // Send user message to TherapistGPT and handle the response asynchronously
+
+            try {
+                const taskId = await TaskIDSendMessageToTherapist(userMessage);
+
+                const response = await getTaskResult(taskId);
+
+                if (response.response === false) {
+                    alert('Please provide a valid OpenAI API Key, with the blue button on the bottom right of the window.');}
+
+
+                try {
+                if (response.response.hasOwnProperty('user_name')) {
+                    user_name = response.response.user_name;
+                    user_name_changed = true;
+                }} catch (error) {
+                    // pass
+                }
+
+                await addMessageToChat('therapist', response.response['response'], true);
+
+            } catch (error) {
+                console.error('Error getting therapist message:', error);
+            }
+
+        }
+
+        // Sending first message totherapist
+        sendMessageToTherapist('Start_conversation', true)
 
         async function addMessageToChat(sender, message, withTypingEffect = false) {
             let sender_name;
@@ -177,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         }
 
-        async function sendMessageToTherapist(message, first_msg=false) {
+        async function TaskIDSendMessageToTherapist(message, first_msg=false) {
             // Implement the API call to TherapistGPT (using Fetch or Axios)
 
             const response = await fetch('/therapy/api-message/', {
@@ -190,30 +238,38 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
 
-            if (data.hasOwnProperty('user_name')) {
-                user_name = data.user_name;
-                user_name_changed = true;
-            }
+            return data.task_id;
 
-            if (first_msg) {
-                return data.response;
-            }
-            if (data.response === false) {
-                alert('Please provide a valid OpenAI API Key, with the blue button on the bottom right of the window.');
-            } else {
-
-                return data.response;}
-
-            // For now, return a dummy response
-            // return new Promise((resolve) =>
-            //     setTimeout(() => resolve('This is a dummy therapist response.'), 1000)
-            // );
         }
 
-        // Send first message to TherapistGPT
-        sendMessageToTherapist('Start_conversation', true).then((response) => {
-            addMessageToChat('therapist', response, true);
-        });
+        // Check periodically if the Therapist answer has been computed
+        async function getTaskResult(task_id) {
+            return new Promise(async (resolve, reject) => {
+                const checkStatus = async () => {
+
+                    const response = await fetch('/therapy/check-task-status/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        },
+                        body: new URLSearchParams({task_id: task_id})
+                    });
+
+                    const json = await response.json();
+
+                    if (json.state === 'SUCCESS') {
+                        resolve(json);
+                    } else if (json.state === 'FAILURE') {
+                        console.log('Failed to retrieve therapist message')
+                        reject(new Error('Task failed'));
+                    } else {
+                        setTimeout(checkStatus, 2000);} // Check status every 2000 milisecond / 2s
+
+                }
+                checkStatus();
+            })
+        }
 
         async function onApiKeyBtnClick() {
             const apiKey = window.prompt('Please enter your OpenAI API key, we will only use it to query ' +
@@ -230,8 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
                   body: new URLSearchParams({ api_key: apiKey }),
     });
               const api_answer = await response.json();
-
-              console.log(api_answer)
 
                 if (api_answer.response['api_key_valid'] === true) {
                     valid_api_key = true;

@@ -153,6 +153,7 @@ class Therapy(object):
             'end_therapy': self.end_therapy,
             'present_therapy_type': self.present_therapy_type,
             'ask_primary_informations': self.ask_primary_informations,
+            'ask_for_example': self.ask_for_example,
         }
 
         self.action_functions_for_evaluation: dict = {
@@ -308,7 +309,7 @@ class Therapy(object):
                     else 'continue_conversation'
                 )
             else:
-                command = 'continue_conversation'
+                command = 'ask_for_example'
 
         print(TC.RED + command)
         print(TC.RESET)
@@ -543,6 +544,14 @@ class Therapy(object):
 
         return self.prompter.get_prompt_content(prompt_type='prebuilts',
                                                 prompt_name='start_conversation').replace('xxx', self.therapist_name)
+
+    def ask_for_example(self) -> str:
+
+        ask_prompt = self.prompter.get_prompt_content(prompt_type='assistant',
+                                                      prompt_name='ask_for_example')
+
+        return self.GPT.paraphrase(content=ask_prompt,
+                                   context=self.build_context())
 
     def ask_primary_informations(self) -> str:
 

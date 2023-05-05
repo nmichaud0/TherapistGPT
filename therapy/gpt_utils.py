@@ -198,14 +198,15 @@ class GPT:
     def paraphrase(self, content: str, context: str = None) -> str:
 
         if context:
-            prompt = f'CONTEXT: {context}\n' \
+            prompt = f'CONTEXT:\n{context}\n' \
                      f'Please paraphrase:\n' \
-                     f'{content}\n' \
-                     f'Only answer with one paraphrase, based on the content given previously, and nothing else.'
+                     f'CONTENT:\n{content}\n' \
+                     f'Only answer with one paraphrase, based on the content given previously, and absolutely ' \
+                     f'nothing else.'
         else:
             prompt = f'Please paraphrase:\n' \
                      f'{content}\n' \
-                     f'Only answer with one paraphrase and nothing else.'
+                     f'Only answer with one paraphrase to the following sentence and absolutely nothing else.'
 
         msg_handler = MessagesHandler()
 
@@ -257,12 +258,6 @@ class MessagesHandler:
             'system',
             'user',
         }, 'Role must be either "assistant", "system" or "user"'
-
-        if time:
-            if full_time:
-                message = f'{message} - [{self.time.get_full_time(update=True)}]'
-            else:
-                message = f'{message} - [{self.time.get_hour_minute(update=True)}]'
 
         return_message = {
             'role': role,

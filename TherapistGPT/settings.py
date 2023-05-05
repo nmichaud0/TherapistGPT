@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-975bp=lv3v4-yu-%kr9l(0ra8a9d@$3b_ecetc#(f6)d8v&hg2"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -129,8 +129,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 django_on_heroku.settings(locals())
 
-#DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)  # TODO: REMOVE WHEN RUNNING LOCALLY
+# Check if running on Heroku:
+
+is_on_heroku = 'DYNO' in os.environ
+
+
+if is_on_heroku:
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)  # Only for running online
 
 # Extra config for whitenoise
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379') if is_on_heroku else 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://localhost:6379') if is_on_heroku else 'redis://localhost:6379'

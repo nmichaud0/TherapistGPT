@@ -5,6 +5,8 @@ from django.core.cache import cache
 import yaml
 import openai
 import json
+from .tasks import play_conversation_time_consuming
+from celery.result import AsyncResult
 
 SERVER_PARAMETERS = yaml.safe_load(open('parameters.yaml', 'r'))
 
@@ -16,11 +18,11 @@ def home(request):
 
 def chat(request):
 
-    print('Chat requested')
-
     therapy_object = Therapy(api_key=SERVER_PARAMETERS['api-key'])
 
     request.session['therapist_parameters'] = therapy_object.get_parameters()
+
+    request.session['api-key'] = ''
 
     request.session['api-key-valid'] = False
 
@@ -35,6 +37,7 @@ def api_message(request):
         return JsonResponse({'response': 'Invalid request method'}, status=400)
 
     therapy_parameters = request.session.get('therapist_parameters')
+
     first_msg = request.session.get('first_message_sent')
 
     if request.session.get('api-key-valid') or (not first_msg):
@@ -42,25 +45,53 @@ def api_message(request):
         if not first_msg:
             request.session['first_message_sent'] = True
 
-        therapy_object = Therapy(api_key=SERVER_PARAMETERS['api-key'])
+        #therapy_object = Therapy(api_key=request.session.get('api-key'))
 
-        therapy_object.update_parameters(therapy_parameters)
+        #therapy_object.update_parameters(therapy_parameters)
 
         user_input = request.POST.get('input_text', '')
-        assistant_message = therapy_object.play_conversation(user_input)
 
-        request.session['therapist_parameters'] = therapy_object.get_parameters()
+        # assistant_message = therapy_object.play_conversation(user_input)  # This is the original time-consuming line
 
-        print(therapy_object.get_parameters())
+        task = play_conversation_time_consuming.delay(therapy_parameters,
+                                                      request.session.get('api-key'),
+                                                      user_input)
+        task_id = task.id
 
-        if isinstance(assistant_message, tuple):
-            return JsonResponse({'response': assistant_message[0], 'user_name': assistant_message[1]})
-
-        else:
-            return JsonResponse({'response': assistant_message})
+        return JsonResponse({'respone': None, 'task_id': task_id}, status=202)
 
     else:
         return JsonResponse({'response': False})  # Invalid API Key
+
+
+def check_task_status(request):
+
+    task = AsyncResult(request.POST.get('task_id'))
+
+    if task.state == 'PENDING':
+        response = {'state': task.state,
+                    'status': 'Pending...'}
+    elif task.state == 'SUCCESS':
+
+        assistant_message = task.result['assistant_message']
+        therapy_parameters = task.result['therapy_parameters']
+
+        request.session['therapist_parameters'] = therapy_parameters
+
+        if isinstance(assistant_message, tuple) or isinstance(assistant_message, list):
+            response = {'response': assistant_message[0], 'user_name': assistant_message[1]}
+
+        else:
+            response = {'response': assistant_message}
+
+        response = {'state': task.state,
+                    'response': response}
+
+    else:
+        response = {'state': task.state,
+                    'status': str(task.info)}
+
+    return JsonResponse(response)
 
 
 def update_api_key(request):
@@ -69,9 +100,6 @@ def update_api_key(request):
         return JsonResponse({'response': 'Invalid request method'}, status=400)
 
     api_key = request.POST.get('api_key', '')
-
-    print('API Key: ')
-    print(api_key)
 
     try:
         openai.api_key = api_key
@@ -88,7 +116,7 @@ def update_api_key(request):
 
     if valid_api_key:
 
-        valid_gpt4 = check_GPT4(request)
+        valid_gpt4 = check_GPT4(request, api_key)
 
         therapy_parameters = request.session.get('therapist_parameters')
 
@@ -103,6 +131,8 @@ def update_api_key(request):
 
         request.session['therapist_parameters'] = therapy_parameters
 
+        request.session['api-key'] = api_key
+
         request.session['api-key-valid'] = True
 
         if valid_gpt4:
@@ -116,14 +146,12 @@ def update_api_key(request):
         return JsonResponse({'response': {'api_key_valid': False, 'gpt4': False}}, status=200)
 
 
-def check_GPT4(request):
+def check_GPT4(request, api_key):
 
     therapy_parameters = request.session['therapist_parameters']
 
     if isinstance(therapy_parameters, str):
         therapy_parameters = json.loads(therapy_parameters)
-
-    api_key = therapy_parameters['api_key']
 
     try:
         openai.api_key = api_key
@@ -133,7 +161,7 @@ def check_GPT4(request):
             max_tokens=1)
 
         valid_gpt4 = True
-    except openai.error.AuthenticationError:
+    except Exception as e:
 
         valid_gpt4 = False
 
@@ -181,7 +209,5 @@ def download_data(request):
 
     if isinstance(therapy_parameters, str):
         therapy_parameters = json.loads(therapy_parameters)
-
-    print(therapy_parameters, type(therapy_parameters))
 
     return JsonResponse({'response': therapy_parameters}, status=200)

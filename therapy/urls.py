@@ -8,5 +8,6 @@ urlpatterns = [
     path('update-api-key/', views.update_api_key, name='update_api_key'),
     path('update-model/', views.update_model, name='update_model'),
     path('download-data/', views.download_data, name='download_data'),
+    path('check-task-status/', views.check_task_status, name='check_task_status')
 ]
 
