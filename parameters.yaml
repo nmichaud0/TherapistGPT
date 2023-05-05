@@ -8,7 +8,6 @@ therapist:
 
 django-settings:
   - debug: True
-  - secret-key: xxx
   - allowed-host: localhost
   - time_zone: Europe/Geneva
   - language_code: en
